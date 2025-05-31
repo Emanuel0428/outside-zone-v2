@@ -1,11 +1,9 @@
 import { ThemeProvider } from 'next-themes'
 import type { AppProps } from 'next/app'
 
-import ReactBricksApp from '../components/ReactBricksApp'
-
 import '../css/styles.css'
 
-const MyApp = (props: AppProps) => {
+const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <ThemeProvider
       attribute="class"
@@ -13,7 +11,7 @@ const MyApp = (props: AppProps) => {
       enableSystem={false}
       defaultTheme="light"
     >
-      <ReactBricksApp {...props}></ReactBricksApp>
+      <Component {...pageProps} />
     </ThemeProvider>
   )
 }
