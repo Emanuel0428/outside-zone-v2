@@ -4,38 +4,40 @@ import Header from '../components/store/Header'
 import Image from 'next/image'
 import Link from 'next/link'
 import { CartProvider } from '../context/CartContext'
-import { queryShopify } from '../lib/shopify'
+import { getProducts } from '../lib/shopify'
 import { GetStaticProps } from 'next'
 
 interface ProductsResponse {
-  products: {
-    edges: Array<{
-      node: {
-        id: string
-        title: string
-        handle: string
-        description: string
-        images: {
-          edges: Array<{
-            node: {
-              url: string
-              altText: string
+  data: {
+    products: {
+      edges: Array<{
+        node: {
+          id: string
+          title: string
+          handle: string
+          description: string
+          images: {
+            edges: Array<{
+              node: {
+                url: string
+                altText: string
+              }
+            }>
+          }
+          priceRange: {
+            minVariantPrice: {
+              amount: string
+              currencyCode: string
             }
-          }>
-        }
-        priceRange: {
-          minVariantPrice: {
-            amount: string
-            currencyCode: string
           }
         }
-      }
-    }>
+      }>
+    }
   }
 }
 
 interface ProductsPageProps {
-  products: ProductsResponse['products']['edges']
+  products: ProductsResponse['data']['products']['edges']
 }
 
 // Categorías estáticas por ahora - más adelante podríamos obtenerlas de Shopify
@@ -247,48 +249,34 @@ export default function ProductsPage({ products: initialProducts }: ProductsPage
 }
 
 // Implementar ISR
-export const getStaticProps: GetStaticProps<ProductsPageProps> = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   try {
-    const response = await queryShopify<ProductsResponse>(`{
-      products(first: 10) {
-        edges {
-          node {
-            id
-            title
-            handle
-            description
-            images(first: 1) {
-              edges {
-                node {
-                  url
-                  altText
-                }
-              }
-            }
-            priceRange {
-              minVariantPrice {
-                amount
-                currencyCode
-              }
-            }
-          }
-        }
-      }
-    }`);
+    const response = await getProducts();
     
+    // If no products data in response, return empty array
+    if (!response.data?.products?.edges) {
+      console.log('No products data in response:', response);
+      return {
+        props: {
+          products: [],
+        },
+        revalidate: 60,
+      };
+    }
+
     return {
       props: {
         products: response.data.products.edges,
       },
-      revalidate: 3600,
-    }
+      revalidate: 60,
+    };
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching products:', error);
     return {
       props: {
         products: [],
       },
-      revalidate: 3600,
-    }
+      revalidate: 60,
+    };
   }
 } 
