@@ -2,7 +2,7 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import Header from '../../components/store/Header'
-import { CartProvider } from '../../context/CartContext'
+import { DynamicCartProvider } from '../../context/CartContext'
 import { queryShopify } from '../../lib/shopify'
 
 interface ProductResponse {
@@ -77,7 +77,7 @@ export default function ProductPage({ product }: ProductProps) {
   }
 
   return (
-    <CartProvider>
+    <DynamicCartProvider>
       <div className="min-h-screen bg-black">
         <Header />
         
@@ -150,7 +150,7 @@ export default function ProductPage({ product }: ProductProps) {
           </div>
         </div>
       </div>
-    </CartProvider>
+    </DynamicCartProvider>
   )
 }
 

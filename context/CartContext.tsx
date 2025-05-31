@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useState } from 'react'
+import dynamic from 'next/dynamic'
 
 interface CartItem {
   id: string
@@ -108,21 +109,23 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('outside-zone-cart')
-      if (savedCart) {
-        const parsedCart = JSON.parse(savedCart)
-        dispatch({ type: 'LOAD_CART', payload: parsedCart })
+    if (typeof window !== 'undefined') {
+      try {
+        const savedCart = localStorage.getItem('outside-zone-cart')
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart)
+          dispatch({ type: 'LOAD_CART', payload: parsedCart })
+        }
+      } catch (error) {
+        console.error('Error loading cart from localStorage:', error)
       }
-    } catch (error) {
-      console.error('Error loading cart from localStorage:', error)
+      setIsLoaded(true)
     }
-    setIsLoaded(true)
   }, [])
 
   // Save cart to localStorage whenever state changes
   useEffect(() => {
-    if (isLoaded) {
+    if (isLoaded && typeof window !== 'undefined') {
       try {
         localStorage.setItem('outside-zone-cart', JSON.stringify(state))
       } catch (error) {
@@ -156,7 +159,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   )
 }
 
+// Export a dynamic version of CartProvider that only runs on client
+export const DynamicCartProvider = dynamic(
+  () => Promise.resolve(CartProvider),
+  { ssr: false }
+)
+
 export const useCart = () => {
+  if (typeof window === 'undefined') {
+    return {
+      state: { items: [], total: 0, itemCount: 0 },
+      dispatch: () => {},
+      addToCart: () => {},
+      removeFromCart: () => {},
+      updateQuantity: () => {},
+      clearCart: () => {},
+      isLoaded: false,
+    }
+  }
+  
   const context = useContext(CartContext)
   if (!context) {
     throw new Error('useCart must be used within a CartProvider')
