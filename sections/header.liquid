@@ -1,0 +1,44 @@
+<header class="site-header">
+  <div class="page-width">
+    <div class="header-wrapper">
+      <div class="site-header__logo">
+        {% if section.settings.logo %}
+          <a href="/" class="site-header__logo-link">
+            {{ section.settings.logo | image_url: width: section.settings.logo_width | image_tag: class: 'site-header__logo-image' }}
+          </a>
+        {% else %}
+          <a href="/" class="site-header__logo-link">{{ shop.name }}</a>
+        {% endif %}
+      </div>
+
+      <nav class="site-nav">
+        {% for link in linklists.main-menu.links %}
+          <a href="{{ link.url }}" class="site-nav__link">{{ link.title }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo image"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 50,
+      "max": 250,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 100
+    }
+  ]
+}
+{% endschema %} 

@@ -1,0 +1,58 @@
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+
+<div class="product-template">
+  <div class="product-images">
+    {% for image in product.images %}
+      <div class="product-image">
+        <img src="{{ image | img_url: 'large' }}" alt="{{ image.alt | escape }}">
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="product-details">
+    <h1>{{ product.title }}</h1>
+    
+    <div class="product-price">
+      <span class="price">{{ current_variant.price | money }}</span>
+      {% if product.compare_at_price_max > product.price %}
+        <span class="compare-price">{{ current_variant.compare_at_price | money }}</span>
+      {% endif %}
+    </div>
+
+    {% form 'product', product %}
+      <select name="id" id="ProductSelect">
+        {% for variant in product.variants %}
+          <option value="{{ variant.id }}"
+            {% if variant == current_variant %}selected="selected"{% endif %}
+          >
+            {{ variant.title }} - {{ variant.price | money }}
+          </option>
+        {% endfor %}
+      </select>
+
+      <div class="quantity">
+        <label for="Quantity">Quantity</label>
+        <input type="number" id="Quantity" name="quantity" value="1" min="1">
+      </div>
+
+      <button type="submit" name="add" class="add-to-cart">
+        {% if current_variant.available %}
+          Add to Cart
+        {% else %}
+          Sold Out
+        {% endif %}
+      </button>
+    {% endform %}
+
+    <div class="product-description">
+      {{ product.description }}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": []
+}
+{% endschema %} 

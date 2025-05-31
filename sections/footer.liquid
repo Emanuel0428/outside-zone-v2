@@ -1,0 +1,73 @@
+<footer class="site-footer">
+  <div class="page-width">
+    <div class="footer-wrapper">
+      {% if section.blocks.size > 0 %}
+        {% for block in section.blocks %}
+          <div class="footer-block" {{ block.shopify_attributes }}>
+            {% case block.type %}
+              {% when 'text' %}
+                <h2>{{ block.settings.title }}</h2>
+                {{ block.settings.text }}
+              {% when 'menu' %}
+                <h2>{{ block.settings.menu_title }}</h2>
+                <ul>
+                  {% for link in linklists[block.settings.menu].links %}
+                    <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+                  {% endfor %}
+                </ul>
+            {% endcase %}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="footer-bottom">
+      <small class="copyright">© {{ 'now' | date: "%Y" }} {{ shop.name }}</small>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share store details, promotions, or brand content with your customers</p>"
+        }
+      ]
+    },
+    {
+      "type": "menu",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_title",
+          "label": "Heading",
+          "default": "Menu"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 
