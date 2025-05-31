@@ -164,4 +164,9 @@ export async function getProductByHandle(handle: string) {
   `;
 
   return storefront(query, { handle });
+}
+
+export async function queryShopify<T>(query: string, variables = {}) {
+  const response = await storefront(query, variables);
+  return response as { data: T };
 } 
